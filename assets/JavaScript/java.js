@@ -1,22 +1,14 @@
 $(document).ready(function () {
     // VARIABLES
-    //Setting API key
-    let apiKey = 'N5NWVyFyj72fV7L3grGZOd9vF6pc1FXF';
-    let limit = 10;
-    let searchTopic = 0;
-    let requests = 'api.giphy.com/v1/gifs/search?q=' + searchTopic + '&api_key=' + apiKey + '&limit=' + limit;
-
-    //Example of url request from "https://developers.giphy.com/docs/"
-    // http://api.giphy.com/v1/gifs/search?q=ryan+gosling&api_key=YOUR_API_KEY&limit=5');
-
+    
     let topics = ['bunnies', 'dogs', 'cats', 'birds'];
-
+    
     createButtons();
     //creating buttons from the array
     function createButtons() {
         for (let i = 0; i < topics.length; i++) {
             let button = $('<button>');
-            button.val(topics[i]).text(topics[i]).addClass('animals');
+            button.val(topics[i]).text(topics[i]).addClass('buttons');
             // making sure values are added to buttons
             let value = button.val();
             console.log(value);
@@ -25,24 +17,37 @@ $(document).ready(function () {
         }
     }
     //click add button to append to the end of topics
-    $('.addOn').on('click', function () {
+    $('.addOn').on('click', function (event) {
+        event.preventDefault();
         let values = $('.addTopic').val();
+        values= values.toLowerCase();
         if (topics.includes(values)) {
             alert('this has already been added to the list already');
             return;
         } else {
             topics.push(values);
-            let button = $('button');
-            button.val(values).text(values);
+            let button = $('<button>');
+            button.val(values).text(values).addClass('buttons');
             $('#gifsButtons').append(button);
         }
     })
-
-    $('button').on('click',function(){
-        summonGifs();
+    
+    $('.buttons').on('click',function(event){
+        event.preventDefault();
+        console.log('derp');
+        //Setting API key
+        // let apiKey = 'N5NWVyFyj72fV7L3grGZOd9vF6pc1FXF';
+        // let limit = 10;
+        let searchTopic = $(this).val();
+        let requests = `http://api.giphy.com/v1/gifs/search?q=${searchTopic}&api_key=N5NWVyFyj72fV7L3grGZOd9vF6pc1FXF&limit=10`;
+        console.log(searchTopic);
+        console.log(requests);
+        //Example of url request from "https://developers.giphy.com/docs/"
+        // http://api.giphy.com/v1/gifs/search?q=ryan+gosling&api_key=YOUR_API_KEY&limit=5');
+        summonGifs(requests);
     })
 
-    function summonGifs() {
+    function summonGifs(requests) {
         $.ajax({
             url: requests,
             method: 'GET'
@@ -50,9 +55,24 @@ $(document).ready(function () {
             .then(function (response) {
                 console.log(requests);
                 console.log(response);
+                createJifs(response);
             });
     }
 
+    function createJifs(reponse){
+        let jif= response.data;
+
+        for (let i =0; i<jif.length;i++){
+            let newDiv = $('<div>');
+            let p = $('<p>');
+            p.text(jif[i].rating);
+            let jifImage = $('<img>');
+            jifImage.attr("src", jif[i].images.fixed_height.url);
+            newDiv.append(p);
+            newDiv.append(jifImage);
+            $('#gifsDisplay').append
+        }
+    }
     // 1. Before you can make any part of our site work, you need to create an array of strings, each one related to a topic that interests you. Save it to a variable called `topics`.
     //    * We chose animals for our theme, but you can make a list to your own liking.
 
