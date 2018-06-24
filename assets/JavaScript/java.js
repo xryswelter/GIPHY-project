@@ -8,7 +8,7 @@ $(document).ready(function () {
     function createButtons() {
         for (let i = 0; i < topics.length; i++) {
             let button = $('<button>');
-            button.val(topics[i]).text(topics[i]).addClass('buttons');
+            button.val(topics[i]).text(topics[i]).addClass('buttons').addClass('animals');
             // making sure values are added to buttons
             let value = button.val();
             console.log(value);
@@ -27,17 +27,15 @@ $(document).ready(function () {
         } else {
             topics.push(values);
             let button = $('<button>');
-            button.val(values).text(values).addClass('buttons');
+            button.val(values).text(values).addClass('buttons').addClass('animals');
             $('#gifsButtons').append(button);
         }
     })
     
-    $('.buttons').on('click',function(event){
+    $(document).on('click','.buttons',function(event){
         event.preventDefault();
+        $('#gifsDisplay').empty();
         console.log('derp');
-        //Setting API key
-        // let apiKey = 'N5NWVyFyj72fV7L3grGZOd9vF6pc1FXF';
-        // let limit = 10;
         let searchTopic = $(this).val();
         let requests = `http://api.giphy.com/v1/gifs/search?q=${searchTopic}&api_key=N5NWVyFyj72fV7L3grGZOd9vF6pc1FXF&limit=10`;
         console.log(searchTopic);
@@ -59,20 +57,38 @@ $(document).ready(function () {
             });
     }
 
-    function createJifs(reponse){
+    function createJifs(response){
+        console.log(response.data);
         let jif= response.data;
 
         for (let i =0; i<jif.length;i++){
             let newDiv = $('<div>');
             let p = $('<p>');
-            p.text(jif[i].rating);
+            p.text('Rated: ' + jif[i].rating.toUpperCase());
             let jifImage = $('<img>');
-            jifImage.attr("src", jif[i].images.fixed_height.url);
-            newDiv.append(p);
+            jifImage.attr("src", jif[i].images.fixed_height_still.url);
+            jifImage.attr('data-animate', jif[i].images.preview_gif.url);
+            jifImage.attr('data-still', jif[i].images.fixed_height_still.url);
+            jifImage.attr('data-state','still');
+            jifImage.addClass('jif');
             newDiv.append(jifImage);
-            $('#gifsDisplay').append
+            newDiv.append(p);
+            $('#gifsDisplay').append(newDiv);
+            $('.shade').css('background-color', 'azure')
         }
     }
+
+    $(document).on('click','.jif',function(){
+        var state = $(this).attr("data-state");
+
+        if (state === "still") {
+            $(this).attr("src", $(this).attr("data-animate"));
+            $(this).attr("data-state", "animate");
+          } else {
+            $(this).attr("src", $(this).attr("data-still"));
+            $(this).attr("data-state", "still");
+          }
+    })
     // 1. Before you can make any part of our site work, you need to create an array of strings, each one related to a topic that interests you. Save it to a variable called `topics`.
     //    * We chose animals for our theme, but you can make a list to your own liking.
 
